@@ -1,10 +1,12 @@
 import { GrammyContext, GrammyConversation } from "$grammy/context.ts";
 import { Composer, InlineKeyboard, createConversation } from "$grammy/deps.ts";
+import { hydrateReply } from "grammy_parse_mode";
 
 async function createProject(convo: GrammyConversation, ctx: GrammyContext) {
   let circleType: "group" | "channel" = "group";
 
   try {
+    await convo.run(hydrateReply<GrammyContext>);
     await ctx.reply("Please enter the name of your project:");
     const name = await convo.form.text((c) => c.reply("Please enter a name!"));
 
@@ -123,9 +125,9 @@ async function createProject(convo: GrammyConversation, ctx: GrammyContext) {
 
         if (chatType === circleType) {
           // check if the user is an admin of the group/channel
-          const chatAdmins = await convo.external(() =>
-            ctx.api.getChatAdministrators(chatInfo.id).catch(() => [])
-          );
+          const chatAdmins = await ctx.api
+            .getChatAdministrators(chatInfo.id)
+            .catch(() => []);
 
           if (chatAdmins.length > 0) {
             const isAdmin = chatAdmins.some(
@@ -184,16 +186,18 @@ async function createProject(convo: GrammyConversation, ctx: GrammyContext) {
     convo.log(`Currency selected: ${currency.match}`);
     // <--- end of project's default currency selection --->
 
+    const foundCurrency = currencies.find((c) => c.code === currency.match);
+
     const messages = [
       `Your new project *${name}* has been created successfully\\! 🎉`,
-      `Your project's default currency is *${currencies.find(
-        (c) => c.code === currency.match
-      )}*`,
+      `Your project's default currency is *${foundCurrency?.code}*`,
     ];
 
     messages.push(`Go to /myprojects to see your new project being added\\!`);
+    const message = `${messages.join("\n\n")}`;
 
-    await ctx.replyWithMarkdownV2(messages.join("\n\n"));
+    await ctx.replyWithMarkdownV2(message);
+
     return;
   } catch (e) {
     const error = e as Error;
