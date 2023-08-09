@@ -254,13 +254,14 @@ async function createProject(convo: GrammyConversation, ctx: GrammyContext) {
 
     convo.log({ currencyInfo });
 
-    const messages = [
+    const message = fmt(
+      ["\n\n", "\n\n", "\n\n", "\n\n"],
       fmt`Your new project ${bold(name)} has been created successfully! 🎉`,
       fmt`Your project's default currency is ${bold(`${currencyInfo?.code}`)}`,
       `Go to /myprojects to see your new project being added!`,
-    ];
+    )
 
-    const message = `${messages.join("\n\n")}`;
+    // const message = `${messages.join("\n\n")}`;
 
     await ctx.replyFmt(
       fmt(
