@@ -5,13 +5,10 @@ import { bold, fmt, hydrateReply, italic } from "grammy_parse_mode";
 export class ProjectConversation {
   name?: string;
   description?: string;
-  tos?: string;
-  policy?: string;
 
   project?: Awaited<ReturnType<typeof createProject>>;
   circleType: "channel" | "group" = "channel";
 
-  private doneKb = new InlineKeyboard().text("Done", "done");
 
   constructor(
     readonly ctx: GrammyContext,
@@ -43,7 +40,7 @@ export class ProjectConversation {
   private async promptsGuideForGroup() {
     this.circleType = "group";
 
-    await this.ctx.reply(
+    await this.ctx.replyWithHTML(
       `Please create a private Telegram Group add the bot (@${this.ctx.me.username}) to the group and make it an admin with the following permissions:
   - <b>Invite Users via Link</b>
   - <b>Ban Users</b>\n\nClick Done when it's ready:
@@ -64,7 +61,7 @@ export class ProjectConversation {
 
     await this.ctx.replyWithChatAction("typing");
 
-    await this.ctx.reply(
+    await this.ctx.replyWithHTML(
       `Please look for your own account in group admins section of your group info menu and make sure that <b>Remain Anonymous</b> is turned <b>ON</b>.\n\nNo such option? Please turn <b>Chat History For New Members to Visible</b> first.\n\nClick Done when it's ready:`,
       {
         reply_markup: new InlineKeyboard().text("Done", "done3"),
@@ -72,7 +69,7 @@ export class ProjectConversation {
     );
 
     await this.convo.waitForCallbackQuery(["done3"], (c) =>
-      c.reply(
+      c.replyWithHTML(
         "Please click Done after you're done making sure that <b>Remain Anonymous</b> is turned <b>ON</b>!",
         {
           reply_markup: new InlineKeyboard().text("Done", "done3"),
@@ -85,7 +82,7 @@ export class ProjectConversation {
     this.circleType = "channel";
 
     // prompts start
-    await this.ctx.reply(
+    await this.ctx.replyWithHTML(
       `Please create a private Telegram Channel add the bot (@${this.ctx.me.username}) to the channel and make it an admin with the following permissions:
       - <b>Add Subscribers</b>
       `,
@@ -186,7 +183,7 @@ export class ProjectConversation {
         repeatLoop = false;
       } // if repeatLoop
 
-      await this.ctx.reply(
+      await this.ctx.replyWithHTML(
         `This is not a valid forwarded message from a ${this.circleType} you're an admin!\n\nDon't forget to make sure that <b>Remain Anonymous</b> is turned <b>ON</b>!\n\nPlease try again with a valid message from a ${this.circleType} or /cancel to cancel.`
       );
     } while (repeatLoop);
@@ -279,7 +276,7 @@ async function createProject(convo: GrammyConversation, ctx: GrammyContext) {
 
     const message = `⛔ An error occurred⛔ : \n<b>${error.name}</b> - <b>${error.message}</b>.\n\nPlease try again later.`;
 
-    await ctx.reply(message);
+    await ctx.replyWithHTML(message);
   }
 }
 

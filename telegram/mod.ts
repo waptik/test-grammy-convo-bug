@@ -1,20 +1,19 @@
 import { GrammyContext } from "$grammy/context.ts";
 import { Bot, conversations, GrammyError, HttpError } from "$grammy/deps.ts";
-import { hydrateReply, parseMode } from "grammy_parse_mode";
+import { hydrateReply } from "grammy_parse_mode";
 import { limit as rateLimit } from "https://deno.land/x/grammy_ratelimiter@v1.1.6/mod.ts";
 
+import drop from "$grammy/handlers/commands/drop.ts";
 import commands from "$grammy/handlers/commands/mod.ts";
 import conversationComposer from "$grammy/handlers/conversations/mod.ts";
-import drop from "$grammy/handlers/commands/drop.ts";
 import ping from "$grammy/middlewares/ping.ts";
 import session from "$grammy/middlewares/session.ts";
-import { listOfCommands } from "../utils.ts";
 import { KEYS_TOKENS } from "../constants.ts";
+import { listOfCommands } from "../utils.ts";
 
 export const grammy = new Bot<GrammyContext>(KEYS_TOKENS.telegram);
 
 // Plugins
-grammy.api.config.use(parseMode("HTML"));
 
 grammy
   .filter((ctx) => {
